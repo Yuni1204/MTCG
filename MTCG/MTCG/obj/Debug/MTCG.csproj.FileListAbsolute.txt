@@ -1,0 +1,8 @@
+C:\Users\Yuni\Documents\GitHub\S3\SWEN\MTCG\MTCG\MTCG\bin\Debug\MTCG.exe.config
+C:\Users\Yuni\Documents\GitHub\S3\SWEN\MTCG\MTCG\MTCG\bin\Debug\MTCG.exe
+C:\Users\Yuni\Documents\GitHub\S3\SWEN\MTCG\MTCG\MTCG\bin\Debug\MTCG.pdb
+C:\Users\Yuni\Documents\GitHub\S3\SWEN\MTCG\MTCG\MTCG\obj\Debug\MTCG.csproj.AssemblyReference.cache
+C:\Users\Yuni\Documents\GitHub\S3\SWEN\MTCG\MTCG\MTCG\obj\Debug\MTCG.csproj.SuggestedBindingRedirects.cache
+C:\Users\Yuni\Documents\GitHub\S3\SWEN\MTCG\MTCG\MTCG\obj\Debug\MTCG.csproj.CoreCompileInputs.cache
+C:\Users\Yuni\Documents\GitHub\S3\SWEN\MTCG\MTCG\MTCG\obj\Debug\MTCG.exe
+C:\Users\Yuni\Documents\GitHub\S3\SWEN\MTCG\MTCG\MTCG\obj\Debug\MTCG.pdb
