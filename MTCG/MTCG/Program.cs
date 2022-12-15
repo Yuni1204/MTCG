@@ -5,6 +5,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
+using MTCG.Server;
 
 namespace MTCG
 {
@@ -22,9 +23,12 @@ namespace MTCG
             //serverSock.Listen(5);
             //var clientSock = serverSock.Accept();
             //clientSock.Send(Encoding.ASCII.GetBytes("Hello World"));
-            var Game = new Game();
-            Game.Beschimpfen();
-            return;
+            var db = new DataBase();
+            db.addUser();
+            MyTcpListener server = new MyTcpListener();
+            server.StartServer();
+            //var Game = new Game();
+            //Game.Beschimpfen();
         }
     }
 }
