@@ -24,7 +24,7 @@ namespace MTCG
             //var clientSock = serverSock.Accept();
             //clientSock.Send(Encoding.ASCII.GetBytes("Hello World"));
             
-            var db = new DataBase();
+            //var db = new DataBase();
             //db.addUser();
             //string stringlines = "hello world\nwello horld\nline 3";
             //var rqhandler = new RequestHandler();

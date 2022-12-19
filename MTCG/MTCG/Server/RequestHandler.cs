@@ -19,9 +19,15 @@ namespace MTCG.Server
             {
                 case "/users": //get userinfo, check if already exists, if not add to db
                     //Console.WriteLine("\n\nHTTPINFO: " + httpinfo[1] + "\n\n");
-                    dynamic something = JsonObject.Parse(request[rlen - 1]);
-                    Console.WriteLine(something["Username"]);
-                    Console.WriteLine(something["Password"]);
+                    dynamic userdata = JsonObject.Parse(request[rlen - 1]);
+                    Console.WriteLine(userdata["Username"]);
+                    Console.WriteLine(userdata["Password"]); 
+                    new DataBase().addUser(userdata);
+                    break;
+                case "/sessions":
+                    break;
+                default:
+                    //Console.WriteLine("http request handler switch default");
                     break;
             }
             //Console.WriteLine(request[rlen-1]);

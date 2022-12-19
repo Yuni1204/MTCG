@@ -1,5 +1,7 @@
 ﻿using Npgsql;
 using System;
+using System.Text.Json.Nodes;
+using MTCG.json;
 
 namespace MTCG.Server
 {
@@ -14,31 +16,41 @@ namespace MTCG.Server
         private static string Port = "5432";
 
         private string connString;
+        private string SQLstatement = null;
 
         public DataBase()
         {
             // Build connection string using parameters from portal
             //
-            this.connString =
-                String.Format(
-                    "Server={0};Username={1};Database={2};Port={3};Password={4};SSLMode=Prefer",
-                    Host,
-                    User,
-                    DBname,
-                    Port,
-                    Password);
+            connString = $"Server={Host};" +
+                                $"Username={User};" +
+                                $"Database={DBname};" +
+                                $"Port={Port};" +
+                                $"Password={Password};" +
+                                "SSLMode=Prefer;";
         }
 
-        public void addUser()
+        public void addUser(JsonObject userdata)
         {
             using (var conn = new NpgsqlConnection(connString))
             {
                 conn.Open();
-                using (var command = new NpgsqlCommand("CREATE TABLE IF NOT EXISTS users()", conn))
+                SQLstatement = "CREATE TABLE IF NOT EXISTS users" +
+                               "(id serial PRIMARY KEY, username VARCHAR(50), password VARCHAR(50))";
+                using (var command = new NpgsqlCommand(SQLstatement, conn))
                 {
                     command.ExecuteNonQuery();
                     Console.Out.WriteLine("Finished creating table 'User' if not exists");
                 }
+                SQLstatement = "INSERT INTO users (username, password) " +
+                               "VALUES('" + userdata["Username"] + "', '" + userdata["Password"] + "')"; 
+                using (var command = new NpgsqlCommand(SQLstatement, conn))
+                {
+                    command.ExecuteNonQuery();
+                    Console.Out.WriteLine("Added "+userdata["Username"]+" into DB!");
+                }
+
+                conn.Close();
             }
         }
         /*

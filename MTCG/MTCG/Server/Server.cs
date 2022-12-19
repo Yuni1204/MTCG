@@ -16,7 +16,7 @@ namespace MTCG
             {
                 // Set the TcpListener on port 13000.
                 Int32 port = 10001;
-                IPAddress localAddr = IPAddress.Parse("127.0.0.1");
+                IPAddress localAddr = IPAddress.Loopback; //localhost
 
                 // TcpListener server = new TcpListener(port);
                 server = new TcpListener(localAddr, port);
@@ -53,6 +53,12 @@ namespace MTCG
                         //Console.WriteLine("\nCONSOLEWRITELINE" + data + "END OF CONSOLEWRITELINE\n");
                         // Translate data bytes to a ASCII string.
                         data = System.Text.Encoding.ASCII.GetString(bytes, 0, i);
+                        //
+                        //
+                        //
+                        //
+                        //
+                        //zeile 55 Bytes alle zuerst einlesen-> in eine liste von byte arrays
                         result = result + data;
                         Console.WriteLine("Received: {0}", data);
 
