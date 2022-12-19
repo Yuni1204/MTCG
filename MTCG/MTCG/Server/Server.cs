@@ -3,6 +3,7 @@ using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using MTCG.Server;
 
 namespace MTCG
 {
@@ -26,6 +27,7 @@ namespace MTCG
                 // Buffer for reading data
                 Byte[] bytes = new Byte[256];
                 String data = null;
+                String result = null;
 
                 // Enter the listening loop.
                 while (true)
@@ -38,6 +40,7 @@ namespace MTCG
                     Console.WriteLine("Connected!");
 
                     data = null;
+                    result = null;
 
                     // Get a stream object for reading and writing
                     NetworkStream stream = client.GetStream();
@@ -47,19 +50,28 @@ namespace MTCG
                     // Loop to receive all the data sent by the client.
                     while ((i = stream.Read(bytes, 0, bytes.Length)) != 0)
                     {
+                        //Console.WriteLine("\nCONSOLEWRITELINE" + data + "END OF CONSOLEWRITELINE\n");
                         // Translate data bytes to a ASCII string.
                         data = System.Text.Encoding.ASCII.GetString(bytes, 0, i);
+                        result = result + data;
                         Console.WriteLine("Received: {0}", data);
 
                         // Process the data sent by the client.
-                        data = data.ToUpper();
 
-                        byte[] msg = System.Text.Encoding.ASCII.GetBytes(data);
+
+
+                        ///*
+                        //data = data.ToUpper();
+                        //byte[] msg = System.Text.Encoding.ASCII.GetBytes(data);
 
                         // Send back a response.
-                        stream.Write(msg, 0, msg.Length);
-                        Console.WriteLine("Sent: {0}", data);
+                        //stream.Write(msg, 0, msg.Length);
+                        //Console.WriteLine("Sent: {0}", data);
+                        //*/
+                        if (i < bytes.Length) { break; }
                     }
+                    RequestHandler handler = new RequestHandler();
+                    handler.ParseHttpRequest(result);
                 }
             }
             catch (SocketException e)

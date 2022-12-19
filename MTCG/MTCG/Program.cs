@@ -23,8 +23,12 @@ namespace MTCG
             //serverSock.Listen(5);
             //var clientSock = serverSock.Accept();
             //clientSock.Send(Encoding.ASCII.GetBytes("Hello World"));
+            
             var db = new DataBase();
-            db.addUser();
+            //db.addUser();
+            //string stringlines = "hello world\nwello horld\nline 3";
+            //var rqhandler = new RequestHandler();
+            //rqhandler.ParseHttpRequest(stringlines);
             MyTcpListener server = new MyTcpListener();
             server.StartServer();
             //var Game = new Game();
