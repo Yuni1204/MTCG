@@ -14,7 +14,7 @@ namespace MTCG
             TcpListener server = null;
             try
             {
-                // Set the TcpListener on port 13000.
+                // Set the TcpListener on port .
                 Int32 port = 10001;
                 IPAddress localAddr = IPAddress.Loopback; //localhost
 
@@ -37,21 +37,25 @@ namespace MTCG
                     // Perform a blocking call to accept requests.
                     // You could also use server.AcceptSocket() here.
                     using TcpClient client = server.AcceptTcpClient();
+                    Byte[] buffer = new Byte[client.ReceiveBufferSize];
                     Console.WriteLine("Connected!");
 
                     data = null;
-                    result = null;
+                    //result = null;
 
                     // Get a stream object for reading and writing
                     NetworkStream stream = client.GetStream();
 
-                    int i;
+                    int i = stream.Read(buffer, 0, client.ReceiveBufferSize);
+                    data = System.Text.Encoding.ASCII.GetString(buffer, 0, i);
+                    Console.WriteLine($"Received: {data}");
 
+                    /*
                     // Loop to receive all the data sent by the client.
                     while ((i = stream.Read(bytes, 0, bytes.Length)) != 0)
                     {
                         //Console.WriteLine("\nCONSOLEWRITELINE" + data + "END OF CONSOLEWRITELINE\n");
-                        // Translate data bytes to a ASCII string.
+                        // Translate data bytes to a ASCII string
                         data = System.Text.Encoding.ASCII.GetString(bytes, 0, i);
                         //
                         //
@@ -66,18 +70,19 @@ namespace MTCG
 
 
 
-                        ///*
+                        
                         //data = data.ToUpper();
                         //byte[] msg = System.Text.Encoding.ASCII.GetBytes(data);
 
                         // Send back a response.
                         //stream.Write(msg, 0, msg.Length);
                         //Console.WriteLine("Sent: {0}", data);
-                        //*/
+                        //
                         if (i < bytes.Length) { break; }
                     }
-                    RequestHandler handler = new RequestHandler();
-                    handler.ParseHttpRequest(result);
+                    */
+                    //RequestHandler handler = new RequestHandler();
+                    //handler.ParseHttpRequest(data);
                 }
             }
             catch (SocketException e)

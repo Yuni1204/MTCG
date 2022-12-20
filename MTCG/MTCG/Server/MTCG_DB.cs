@@ -21,13 +21,7 @@ namespace MTCG.Server
         public DataBase()
         {
             // Build connection string using parameters from portal
-            //
-            connString = $"Server={Host};" +
-                                $"Username={User};" +
-                                $"Database={DBname};" +
-                                $"Port={Port};" +
-                                $"Password={Password};" +
-                                "SSLMode=Prefer;";
+            connString = $"Server={Host};Username={User};Database={DBname};Port={Port};Password={Password};SSLMode=Prefer;";
         }
 
         public void addUser(JsonObject userdata)
