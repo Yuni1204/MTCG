@@ -93,6 +93,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DB\SQL_Statements.cs" />
     <Compile Include="Enum\enum.cs" />
     <Compile Include="App\Game.cs" />
     <Compile Include="App\Card.cs" />
@@ -100,7 +101,7 @@
     <Compile Include="json\IUserobj.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Server\MTCG_DB.cs" />
+    <Compile Include="DB\MTCG_DB.cs" />
     <Compile Include="Server\RequestHandler.cs" />
     <Compile Include="Server\Server.cs" />
     <Compile Include="App\SpellCard.cs" />

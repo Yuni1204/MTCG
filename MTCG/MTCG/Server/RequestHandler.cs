@@ -21,8 +21,12 @@ namespace MTCG.Server
                     //Console.WriteLine("\n\nHTTPINFO: " + httpinfo[1] + "\n\n");
                     dynamic userdata = JsonObject.Parse(request[rlen - 1]);
                     Console.WriteLine(userdata["Username"]);
-                    Console.WriteLine(userdata["Password"]); 
-                    new DataBase().addUser(userdata);
+                    Console.WriteLine(userdata["Password"]);
+                    var db = new DB.DataBase();
+                    if (!db.alreadyExists("users", (string)userdata["Username"]))
+                    {
+                        db.addUser(userdata);
+                    }
                     break;
                 case "/sessions":
                     break;

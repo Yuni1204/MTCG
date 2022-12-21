@@ -27,7 +27,7 @@ namespace MTCG
                 // Buffer for reading data
                 Byte[] bytes = new Byte[256];
                 String data = null;
-                String result = null;
+                //String result = null;
 
                 // Enter the listening loop.
                 while (true)
@@ -81,8 +81,8 @@ namespace MTCG
                         if (i < bytes.Length) { break; }
                     }
                     */
-                    //RequestHandler handler = new RequestHandler();
-                    //handler.ParseHttpRequest(data);
+                    RequestHandler handler = new RequestHandler();
+                    handler.ParseHttpRequest(data);
                 }
             }
             catch (SocketException e)

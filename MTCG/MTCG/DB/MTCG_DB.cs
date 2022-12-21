@@ -3,7 +3,7 @@ using System;
 using System.Text.Json.Nodes;
 using MTCG.json;
 
-namespace MTCG.Server
+namespace MTCG.DB
 {
     public class DataBase
     {
@@ -24,20 +24,29 @@ namespace MTCG.Server
             connString = $"Server={Host};Username={User};Database={DBname};Port={Port};Password={Password};SSLMode=Prefer;";
         }
 
+        public bool alreadyExists(string table, string value)
+        {
+            return false;
+        }
+
         public void addUser(JsonObject userdata)
         {
             using (var conn = new NpgsqlConnection(connString))
             {
                 conn.Open();
                 SQLstatement = "CREATE TABLE IF NOT EXISTS users" +
-                               "(id serial PRIMARY KEY, username VARCHAR(50), password VARCHAR(50))";
+                               "(username VARCHAR(50) PRIMARY KEY, password VARCHAR(50))";
                 using (var command = new NpgsqlCommand(SQLstatement, conn))
                 {
                     command.ExecuteNonQuery();
                     Console.Out.WriteLine("Finished creating table 'User' if not exists");
                 }
-                SQLstatement = "INSERT INTO users (username, password) " +
-                               "VALUES('" + userdata["Username"] + "', '" + userdata["Password"] + "')"; 
+
+                SQLstatement = new SQL_Statements().insertInto("users", new string[] {"username", "password"}, 
+                    new string[] { (string)userdata["Username"], (string)userdata["Password"] } );
+                    
+                    //"INSERT INTO users (username, password) " +
+                    //           "VALUES('" + userdata["Username"] + "', '" + userdata["Password"] + "')"; 
                 using (var command = new NpgsqlCommand(SQLstatement, conn))
                 {
                     command.ExecuteNonQuery();
