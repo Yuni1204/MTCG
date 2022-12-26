@@ -60,8 +60,9 @@ namespace MTCG.DB
                 {
                     if (ex.Code == "23505")
                     {
-                        Console.WriteLine("user already exists exception");
+                        return new Server.HttpResponse().HttpResp409();
                     }
+                    Console.WriteLine("some other Exception in PostgresExc");
                 }
 
                 conn.Close();

@@ -29,6 +29,15 @@ namespace MTCG.Server
                 //Content-Length: 0 {Environment.NewLine}
         }
 
+        public string HttpResp409()
+        {
+            return $"""
+                    HTTP/1.1 409 User with same username already registered {Environment.NewLine}
+                    
+                    """;
+            
+        }
+
         public string testmethod()
         {
             return this.test;

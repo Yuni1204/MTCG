@@ -3,6 +3,7 @@ using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading;
 using MTCG.Server;
 using static System.Net.Mime.MediaTypeNames;
 using static System.Net.WebRequestMethods;
@@ -42,6 +43,8 @@ namespace MTCG
                     // You could also use server.AcceptSocket() here.
                     using TcpClient client = server.AcceptTcpClient();
                     Console.WriteLine("Connected!");
+                    //Thread thr = new Thread(() => clientCommunication(socket, client));
+                    //thr.Start();
                     clientCommunication(socket, client);
 
                     //Byte[] buffer = new Byte[client.ReceiveBufferSize];
