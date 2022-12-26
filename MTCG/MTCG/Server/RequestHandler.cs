@@ -9,7 +9,7 @@ namespace MTCG.Server
 {
     internal class RequestHandler
     {
-        public void ParseHttpRequest(string data)
+        public string ParseHttpRequest(string data)
         {
             var request = data.Split('\n');
             int rlen = request.Length;
@@ -25,7 +25,7 @@ namespace MTCG.Server
                     var db = new DB.DataBase();
                     if (!db.alreadyExists("users", (string)userdata["Username"]))
                     {
-                        db.addUser(userdata);
+                        return db.addUser(userdata);
                     }
                     break;
                 case "/sessions":
@@ -40,6 +40,7 @@ namespace MTCG.Server
 
             //    Console.WriteLine(line);
             //}
+            return "400;";
         }
     }
 }

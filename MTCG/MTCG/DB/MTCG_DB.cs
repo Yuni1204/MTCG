@@ -2,6 +2,7 @@
 using System;
 using System.Text.Json.Nodes;
 using MTCG.json;
+using static System.Net.WebRequestMethods;
 
 namespace MTCG.DB
 {
@@ -29,7 +30,7 @@ namespace MTCG.DB
             return false;
         }
 
-        public void addUser(JsonObject userdata)
+        public string addUser(JsonObject userdata)
         {
             using (var conn = new NpgsqlConnection(connString))
             {
@@ -44,17 +45,31 @@ namespace MTCG.DB
 
                 SQLstatement = new SQL_Statements().insertInto("users", new string[] {"username", "password"}, 
                     new string[] { (string)userdata["Username"], (string)userdata["Password"] } );
-                    
-                    //"INSERT INTO users (username, password) " +
-                    //           "VALUES('" + userdata["Username"] + "', '" + userdata["Password"] + "')"; 
-                using (var command = new NpgsqlCommand(SQLstatement, conn))
+
+                //"INSERT INTO users (username, password) " +
+                //           "VALUES('" + userdata["Username"] + "', '" + userdata["Password"] + "')"; 
+                try
                 {
-                    command.ExecuteNonQuery();
-                    Console.Out.WriteLine("Added "+userdata["Username"]+" into DB!");
+                    using (var command = new NpgsqlCommand(SQLstatement, conn))
+                    {
+                        command.ExecuteNonQuery();
+                        Console.Out.WriteLine("Added "+userdata["Username"]+" into DB!");
+                    }
+                }
+                catch (Npgsql.PostgresException ex)
+                {
+                    if (ex.Code == "23505")
+                    {
+                        Console.WriteLine("user already exists exception");
+                    }
                 }
 
                 conn.Close();
             }
+
+            return new Server.HttpResponse().HttpResp201();
+            //return new Server.HttpResponse().testmethod();
+            //"HTTP / 1.1 200 OK \r"
         }
         /*
         public void DBConnect()
