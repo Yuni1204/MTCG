@@ -4,11 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MTCG.json
+namespace MTCG.App
 {
-    internal interface IUserobj
+    internal class User
     {
-        //string Username;
-        //string Password;
+        public string Username { get; set; }
     }
 }

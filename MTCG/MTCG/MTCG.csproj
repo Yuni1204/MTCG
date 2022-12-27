@@ -93,12 +93,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="App\User.cs" />
     <Compile Include="DB\SQL_Statements.cs" />
     <Compile Include="Enum\enum.cs" />
     <Compile Include="App\Game.cs" />
     <Compile Include="App\Card.cs" />
     <Compile Include="App\MonsterCard.cs" />
-    <Compile Include="json\IUserobj.cs" />
+    <Compile Include="json\Users.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="DB\MTCG_DB.cs" />
