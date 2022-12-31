@@ -21,7 +21,7 @@ namespace MTCG
                 Int32 port = 10001;
                 IPAddress localAddr = IPAddress.Loopback; //localhost
 
-                Socket socket = new Socket(localAddr.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+                //Socket socket = new Socket(localAddr.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
 
                 // TcpListener server = new TcpListener(port);
                 server = new TcpListener(localAddr, port);
@@ -43,9 +43,9 @@ namespace MTCG
                     // You could also use server.AcceptSocket() here.
                     using TcpClient client = server.AcceptTcpClient();
                     Console.WriteLine("Connected!");
-                    //Thread thr = new Thread(() => clientCommunication(socket, client));
+                    //Thread thr = new Thread(() => clientCommunication(client));
                     //thr.Start();
-                    clientCommunication(socket, client);
+                    clientCommunication(client);
 
                     //Byte[] buffer = new Byte[client.ReceiveBufferSize];
 
@@ -114,7 +114,7 @@ namespace MTCG
             Console.Read();
         }
 
-        public void clientCommunication(Socket socket, TcpClient client)
+        public void clientCommunication(TcpClient client)
         {
             string data = null;
             Byte[] buffer = new Byte[client.ReceiveBufferSize];

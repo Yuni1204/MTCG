@@ -1,6 +1,7 @@
 ﻿using Npgsql;
 using System;
 using System.Text.Json.Nodes;
+using MTCG.App;
 using MTCG.json;
 using static System.Net.WebRequestMethods;
 
@@ -30,7 +31,7 @@ namespace MTCG.DB
             return false;
         }
 
-        public string addUser(JsonObject userdata)
+        public string addUser(Users userdata)
         {
             using (var conn = new NpgsqlConnection(connString))
             {
@@ -44,7 +45,7 @@ namespace MTCG.DB
                 }
 
                 SQLstatement = new SQL_Statements().insertInto("users", new string[] {"username", "password"}, 
-                    new string[] { (string)userdata["Username"], (string)userdata["Password"] } );
+                    new string[] { userdata.Username, userdata.Password } );
 
                 //"INSERT INTO users (username, password) " +
                 //           "VALUES('" + userdata["Username"] + "', '" + userdata["Password"] + "')"; 
@@ -53,14 +54,14 @@ namespace MTCG.DB
                     using (var command = new NpgsqlCommand(SQLstatement, conn))
                     {
                         command.ExecuteNonQuery();
-                        Console.Out.WriteLine("Added "+userdata["Username"]+" into DB!");
+                        Console.Out.WriteLine("Added "+userdata.Username+" into DB!");
                     }
                 }
                 catch (Npgsql.PostgresException ex)
                 {
-                    if (ex.Code == "23505")
+                    if (ex.SqlState == "23505")
                     {
-                        return new Server.HttpResponse().HttpResp409();
+                        return new Server.HttpResponse().UserCreate409();
                     }
                     Console.WriteLine("some other Exception in PostgresExc");
                 }
@@ -68,10 +69,52 @@ namespace MTCG.DB
                 conn.Close();
             }
 
-            return new Server.HttpResponse().HttpResp201();
+            return new Server.HttpResponse().UserCreate201();
             //return new Server.HttpResponse().testmethod();
             //"HTTP / 1.1 200 OK \r"
         }
+
+        public string searchUser(Users userdata)
+        {
+            using (var conn = new NpgsqlConnection(connString))
+            {
+                conn.Open();
+                SQLstatement = new SQL_Statements().searchUser(userdata.Username, userdata.Password);
+
+                try
+                {
+                    using (var command = new NpgsqlCommand(SQLstatement, conn))
+                    { 
+                        var test = command.ExecuteReader();
+                        if (test.HasRows)
+                        {
+                            return new Server.HttpResponse().Session200();
+                        }
+                        else
+                        {
+                            return new Server.HttpResponse().Session401();
+                        }
+                        
+                    }
+                }
+                catch (Npgsql.PostgresException ex)
+                {
+                    if (ex.SqlState == "23505")
+                    {
+                        return new Server.HttpResponse().UserCreate409();
+                    }
+                    Console.WriteLine("some other Exception in PostgresExc");
+                }
+
+                conn.Close();
+            }
+
+            return null;
+        }
+
+
+
+
         /*
         public void DBConnect()
         {

@@ -6,9 +6,24 @@ using System.Threading.Tasks;
 
 namespace MTCG.json
 {
-    internal class Users
+    public class Users
     {
         public string Username;
         public string Password;
+
+        //public string username
+        //{
+        //    get { return username; }
+        //    set
+        //    {
+
+        //    }
+        //}
+
+        public Users()
+        {
+            Username = null;
+            Password = null;
+        }
     }
 }

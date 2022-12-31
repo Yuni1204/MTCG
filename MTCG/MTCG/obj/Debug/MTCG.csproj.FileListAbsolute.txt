@@ -37,3 +37,9 @@ C:\Users\Yuni\Documents\GitHub\S3\SWEN\MTCG\MTCG\MTCG\bin\Debug\System.Threading
 C:\Users\Yuni\Documents\GitHub\S3\SWEN\MTCG\MTCG\MTCG\bin\Debug\System.Threading.Tasks.Extensions.xml
 C:\Users\Yuni\Documents\GitHub\S3\SWEN\MTCG\MTCG\MTCG\bin\Debug\System.ValueTuple.xml
 C:\Users\Yuni\Documents\GitHub\S3\SWEN\MTCG\MTCG\MTCG\obj\Debug\MTCG.csproj.CopyComplete
+C:\Users\Yuni\Documents\GitHub\S3\SWEN\MTCG\MTCG\MTCG\bin\Debug\Newtonsoft.Json.Bson.dll
+C:\Users\Yuni\Documents\GitHub\S3\SWEN\MTCG\MTCG\MTCG\bin\Debug\Newtonsoft.Json.dll
+C:\Users\Yuni\Documents\GitHub\S3\SWEN\MTCG\MTCG\MTCG\bin\Debug\Newtonsoft.Json.pdb
+C:\Users\Yuni\Documents\GitHub\S3\SWEN\MTCG\MTCG\MTCG\bin\Debug\Newtonsoft.Json.xml
+C:\Users\Yuni\Documents\GitHub\S3\SWEN\MTCG\MTCG\MTCG\bin\Debug\Newtonsoft.Json.Bson.pdb
+C:\Users\Yuni\Documents\GitHub\S3\SWEN\MTCG\MTCG\MTCG\bin\Debug\Newtonsoft.Json.Bson.xml

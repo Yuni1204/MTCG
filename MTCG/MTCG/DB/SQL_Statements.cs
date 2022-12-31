@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -26,6 +27,11 @@ namespace MTCG.DB
             }
             
             return $"INSERT INTO {table} ({columnsreply}) VALUES('{valuesreply}')";
+        }
+
+        public string searchUser(string uname, string pw)
+        {
+            return $"SELECT * from users WHERE username = '{uname}' AND password = '{pw}'";
         }
     }
 }
