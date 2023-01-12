@@ -4,6 +4,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
+using MTCG.DB;
 using MTCG.Server;
 using static System.Net.Mime.MediaTypeNames;
 using static System.Net.WebRequestMethods;
@@ -17,6 +18,11 @@ namespace MTCG
             TcpListener server = null;
             try
             {
+                if (!(new DataBase().ResetTables()))
+                {
+                    throw new Exception("Truncate failed");
+                }
+
                 // Set the TcpListener on port .
                 Int32 port = 10001;
                 IPAddress localAddr = IPAddress.Loopback; //localhost
@@ -31,8 +37,10 @@ namespace MTCG
 
                 // Buffer for reading data
                 Byte[] bytes = new Byte[256];
-                String data = null;
+                //String data = null;
                 //String result = null;
+
+                RequestHandler handler = new RequestHandler();
 
                 // Enter the listening loop.
                 while (true)
@@ -41,64 +49,16 @@ namespace MTCG
 
                     // Perform a blocking call to accept requests.
                     // You could also use server.AcceptSocket() here.
-                    using TcpClient client = server.AcceptTcpClient();
+                    TcpClient client = new TcpClient();
+                    client = server.AcceptTcpClient();
                     Console.WriteLine("Connected!");
-                    //Thread thr = new Thread(() => clientCommunication(client));
-                    //thr.Start();
-                    clientCommunication(client);
-
-                    //Byte[] buffer = new Byte[client.ReceiveBufferSize];
-
-                    //data = null;
-                    ////result = null;
-
-                    //// Get a stream object for reading and writing
-                    //NetworkStream stream = client.GetStream();
-
-                    //int i = stream.Read(buffer, 0, client.ReceiveBufferSize);
-                    //data = System.Text.Encoding.ASCII.GetString(buffer, 0, i);
-                    //Console.WriteLine($"Received: {data}");
-
-                    ///*
-                    //// Loop to receive all the data sent by the client.
-                    //while ((i = stream.Read(bytes, 0, bytes.Length)) != 0)
-                    //{
-                    //    //Console.WriteLine("\nCONSOLEWRITELINE" + data + "END OF CONSOLEWRITELINE\n");
-                    //    // Translate data bytes to a ASCII string
-                    //    data = System.Text.Encoding.ASCII.GetString(bytes, 0, i);
-                    //    //
-                    //    //
-                    //    //
-                    //    //
-                    //    //
-                    //    //zeile 55 Bytes alle zuerst einlesen-> in eine liste von byte arrays
-                    //    result = result + data;
-                    //    Console.WriteLine("Received: {0}", data);
-
-                    //    // Process the data sent by the client.
+                    Thread thr = new Thread(() => clientCommunication(client, handler));
+                    thr.Start();
+                    //ThreadPool.QueueUserWorkItem((c) => clientCommunication(client, handler));
+                    //ThreadPool.QueueUserWorkItem((c) => clientCommunication(client, handler));
+                    //clientCommunication(client, handler);
 
 
-
-
-                    //    //data = data.ToUpper();
-                    //    //byte[] msg = System.Text.Encoding.ASCII.GetBytes(data);
-
-                    //    // Send back a response.
-                    //    //stream.Write(msg, 0, msg.Length);
-                    //    //Console.WriteLine("Sent: {0}", data);
-                    //    //
-                    //    if (i < bytes.Length) { break; }
-                    //}
-                    //*/
-                    //RequestHandler handler = new RequestHandler();
-                    //handler.ParseHttpRequest(data);
-
-                    ////data = "HTTP/1.1 201 SUCCESSS" + Environment.NewLine;
-
-                    //byte[] msg = System.Text.Encoding.ASCII.GetBytes(data);
-
-                    //// Send back a response.
-                    //stream.Write(msg, 0, msg.Length);
                 }
             }
             catch (SocketException e)
@@ -114,7 +74,7 @@ namespace MTCG
             Console.Read();
         }
 
-        public void clientCommunication(TcpClient client)
+        public void clientCommunication(TcpClient client, RequestHandler handler)
         {
             string data = null;
             Byte[] buffer = new Byte[client.ReceiveBufferSize];
@@ -129,10 +89,10 @@ namespace MTCG
             data = System.Text.Encoding.ASCII.GetString(buffer, 0, i);
             Console.WriteLine($"Received: {data}");
 
-            RequestHandler handler = new RequestHandler();
+            
             data = handler.ParseHttpRequest(data);
             //buffer = System.Text.Encoding.ASCII.GetBytes(data);
-            string test = "this is a test!";
+            //string test = "this is a test!";
             //data = "HTTP/1.1 201 SUCCESSS" + Environment.NewLine;
             byte[] msg = System.Text.Encoding.ASCII.GetBytes(data);
 

@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace MTCG
 {
-    internal class Game
+    internal class Battle
     {
         public Card Card1;
         public Card Card2;
-        public Game()
+        public Battle()
         {
             Random rng = new Random();
             //var Card1 = new MonsterCard("Name", "Type");
@@ -41,6 +41,16 @@ namespace MTCG
             Card1.Interact(Card2.Name);
             //Console.WriteLine($"{Card1.Name} beschimpft {Card2.Name}: {Card1.Interact(Card2.Name)}");
             Card2.Interact(Card1.Name);
+        }
+
+        public void Fight(Card c1, Card c2)
+        {
+
+        }
+
+        public void CardEffect(Card c1, Card c2)
+        {
+
         }
     }
 }

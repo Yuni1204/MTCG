@@ -9,7 +9,8 @@ namespace MTCG
    abstract class Card
    {
        private string _name;
-       private string _type; 
+       private string _type;
+       private int _dmg;
 
        public string Name
        {
@@ -21,6 +22,12 @@ namespace MTCG
        {
            get => _type;
            set => _type = value;
+       }
+
+       public int Dmg
+       {
+           get => _dmg;
+           set => _dmg = value;
        }
 
         //Card(string newname, string newtype)
