@@ -7,6 +7,9 @@ using MTCG.App;
 using MTCG.json;
 using static System.Net.WebRequestMethods;
 using System.Data.SqlClient;
+using System.Text;
+using MTCG.Server;
+using Newtonsoft.Json;
 
 namespace MTCG.DB
 {
@@ -27,11 +30,6 @@ namespace MTCG.DB
         {
             // Build connection string using parameters from portal
             connString = $"Server={Host};Username={User};Database={DBname};Port={Port};Password={Password};SSLMode=Prefer;";
-        }
-
-        public bool alreadyExists(string table, string value)
-        {
-            return false;
         }
 
         public bool ResetTables()
@@ -76,7 +74,7 @@ namespace MTCG.DB
             {
                 conn.Open();
                 SQLstatement = "CREATE TABLE IF NOT EXISTS users" +
-                               "(username VARCHAR(50) PRIMARY KEY, password VARCHAR(50), bio VARCHAR(50), " +
+                               "(username VARCHAR(50) PRIMARY KEY, password VARCHAR(50), name VARCHAR(50), bio VARCHAR(50), " +
                                "image VARCHAR(10), coins integer DEFAULT 20, elo integer DEFAULT 100, games integer DEFAULT 0, " +
                                "wins integer DEFAULT 0, losses integer DEFAULT 0, draws integer DEFAULT 0)";
                 using (var command = new NpgsqlCommand(SQLstatement, conn))
@@ -240,6 +238,7 @@ namespace MTCG.DB
                     if (ex.ErrorCode == 23505)
                     {
                         Console.WriteLine("Exception: card already exists!\nSending appropriate HTTP Response...");
+                        conn.Close();
                         return new Server.HttpResponse().Package409();
                     }
                 }
@@ -248,6 +247,7 @@ namespace MTCG.DB
                     //give back 
                 }
                 //create cards one by one
+                conn.Close();
                 return new Server.HttpResponse().Package201();
             }
         }
@@ -263,16 +263,219 @@ namespace MTCG.DB
                 {
                     command.Parameters.AddWithValue("@username", user);
                     var reader = command.ExecuteReader();
-                    if (reader.HasRows)
+                    if (reader.HasRows) //hasRows means user from token exists in db
                     {
                         reader.Read();
+                        if (reader.GetInt32(4) < 5)
+                        {
+                            //not enough money
+                            return new Server.HttpResponse().BuyPackage403();
+                        }
                         Console.WriteLine("get username for package" + reader.GetValue(0));
                     }
-                    //Console.Out.WriteLine("Finished creating table 'packages' if not exists");
+                    else
+                    {
+                        //user not found
+                    }
+                    reader.Close();
+                }
+
+                //get available pack_id
+                int pack_id = 0;
+                using (var command = new NpgsqlCommand(new SQL_Statements().getAvailablePack(), conn))
+                {
+                    var reader = command.ExecuteReader();
+                    if (!reader.HasRows)
+                    {
+                        return new HttpResponse().buyPackage404();
+                    }
+                    reader.Read();
+                    pack_id = reader.GetInt32(0);
+                    
+                    reader.Close();
+                }
+
+                //update bought package to available = false
+                using (var command = new NpgsqlCommand(new SQL_Statements().setPackUnavailable(), conn))
+                {
+                    command.Parameters.AddWithValue("@packID", pack_id);
+                    command.ExecuteNonQuery();
+                }
+
+                //update cards with username
+                using (var command = new NpgsqlCommand(new SQL_Statements().buyPackage(), conn))
+                {
+                    command.Parameters.AddWithValue("@username", user);
+                    command.Parameters.AddWithValue("@packID", pack_id);
+                    command.ExecuteNonQuery();
+                }
+
+                //subtract users coins by 5
+                using (var command = new NpgsqlCommand(new SQL_Statements().userPayCoins(), conn))
+                {
+                    command.Parameters.AddWithValue("@username", user);
+                    command.ExecuteNonQuery();
+                }
+                conn.Close();
+            }
+
+            return new HttpResponse().buyPackage200();
+        }
+
+        public string showCards(string user)
+        {
+            string jsonreply = null;
+            using (var conn = new NpgsqlConnection(connString))
+            {
+                conn.Open();
+
+                using (var command = new NpgsqlCommand(new SQL_Statements().getCardsFromUser(), conn))
+                {
+                    command.Parameters.AddWithValue("@username", user);
+                    var reader = command.ExecuteReader();
+                    if (!reader.HasRows)
+                    {
+                        return new HttpResponse().showCards203();
+                    }
+                    var cards = getCard(reader);
+                    jsonreply = JsonConvert.SerializeObject(cards);
+                    reader.Close();
+                }
+                conn.Close();
+            }
+            return new HttpResponse().showCards200(jsonreply);
+        }
+
+        public string showDeck(string user)
+        {
+            string jsonreply = null;
+            using (var conn = new NpgsqlConnection(connString))
+            {
+                conn.Open();
+
+                using (var command = new NpgsqlCommand(new SQL_Statements().getDeck(), conn))
+                {
+                    command.Parameters.AddWithValue("@username", user);
+                    var reader = command.ExecuteReader();
+                    if (!reader.HasRows)
+                    {
+                        return new HttpResponse().emptyDeck203();
+                    }
+                    var cards = getCard(reader);
+                    jsonreply = JsonConvert.SerializeObject(cards);
+                    reader.Close();
+                }
+
+            }
+
+            return new HttpResponse().showDeck200(jsonreply);
+        }
+
+        public string setDeck(string user, DeckJson deck)
+        {
+            using (var conn = new NpgsqlConnection(connString))
+            {
+                conn.Open();
+                //check if given deck is valid
+                using (var command = new NpgsqlCommand(new SQL_Statements().checkGivenDeck(), conn))
+                {
+                    command.Parameters.AddWithValue("@id1", deck.CardList.ElementAt(0));
+                    command.Parameters.AddWithValue("@id2", deck.CardList.ElementAt(1));
+                    command.Parameters.AddWithValue("@id3", deck.CardList.ElementAt(2));
+                    command.Parameters.AddWithValue("@id4", deck.CardList.ElementAt(3));
+                    command.Parameters.AddWithValue("@username", user);
+                    var reader = command.ExecuteReader();
+                    if (reader.HasRows)
+                    { //given deck is not valid
+                        reader.Read();
+                        if (reader.GetInt32(0) != 4)
+                        {
+                            conn.Close();
+                            return new HttpResponse().setDeck403();
+                        }
+                    }
+                    reader.Close();
+                }
+
+                //if deck valid, reset current Deck and update with new one
+                using (var command = new NpgsqlCommand(new SQL_Statements().resetDeck(), conn))
+                {
+                    command.Parameters.AddWithValue("@username", user);
+                    command.ExecuteNonQuery();
+                }
+
+                using (var command = new NpgsqlCommand(new SQL_Statements().setDeck(), conn))
+                {
+                    command.Parameters.AddWithValue("@id1", deck.CardList.ElementAt(0));
+                    command.Parameters.AddWithValue("@id2", deck.CardList.ElementAt(1));
+                    command.Parameters.AddWithValue("@id3", deck.CardList.ElementAt(2));
+                    command.Parameters.AddWithValue("@id4", deck.CardList.ElementAt(3));
+                    command.Parameters.AddWithValue("@username", user);
+                    command.ExecuteNonQuery();
+                }
+                conn.Close();
+            }
+
+            return new HttpResponse().setDeck200();
+        }
+
+        public string showUserData(string user)
+        {
+            string jsonreply = null;
+            using (var conn = new NpgsqlConnection(connString))
+            {
+                conn.Open();
+                using (var command = new NpgsqlCommand(new SQL_Statements().getUser(), conn))
+                {
+                    command.Parameters.AddWithValue("@username", user);
+                    var reader = command.ExecuteReader();
+                    if (!reader.HasRows)
+                    {
+                        return new HttpResponse().getUser404();
+                    }
+                    reader.Read();
+                    UsersJson userjson = new UsersJson();
+                    userjson.Name = reader.GetValue(0).ToString();
+                    userjson.Bio = reader.GetValue(1).ToString();
+                    userjson.Image = reader.GetValue(2).ToString();
+                    jsonreply = JsonConvert.SerializeObject(userjson);
                 }
             }
 
-            return "hello world";
+            return new HttpResponse().getUser200(jsonreply);
+        }
+
+        public string editUserData(string user, UsersJson userdata)
+        {
+            using (var conn = new NpgsqlConnection(connString))
+            {
+                conn.Open();
+                using (var command = new NpgsqlCommand(new SQL_Statements().editUser(), conn))
+                {
+                    command.Parameters.AddWithValue("@newName", userdata.Name);
+                    command.Parameters.AddWithValue("@newBio", userdata.Bio);
+                    command.Parameters.AddWithValue("@newImage", userdata.Image);
+                    command.Parameters.AddWithValue("@username", user);
+                    command.ExecuteNonQuery();
+                }
+                conn.Close();
+            }
+
+            return new HttpResponse().putUser200();
+        }
+
+        private List<CardsJson> getCard(NpgsqlDataReader reader)
+        {
+            List<CardsJson> reply = new List<CardsJson>();
+            while (reader.Read())
+            {
+                CardsJson card = new CardsJson();
+                card.Id = reader.GetValue(0).ToString();
+                card.Name = reader.GetValue(1).ToString();
+                card.Damage = reader.GetFloat(2);
+                reply.Add(card);
+            }
+            return reply;
         }
     }
 }

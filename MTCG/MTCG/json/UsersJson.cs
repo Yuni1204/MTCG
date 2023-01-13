@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace MTCG.json
 {
-    public class CardsJson
+    public class UsersJson
     {
-        public string Id;
         public string Name;
-        public float Damage;
+        public string Bio;
+        public string Image;
     }
 }

@@ -29,18 +29,36 @@ namespace MTCG.json
         //    }
         //}
 
-        public UsersTable()
+        public UsersTable(/*List<string> data*/)
         {
-            Username = null;
-            Password = null;
-            Bio = null;
-            Image = null;
-            Coins = 20;
-            Elo = 100;
-            GamesPlayed = 0;
-            Wins = 0;
-            Losses = 0;
-            Draws = 0;
+                Username = null;
+                Password = null;
+                Bio = null;
+                Image = null;
+                Coins = 20;
+                Elo = 100;
+                GamesPlayed = 0;
+                Wins = 0;
+                Losses = 0;
+                Draws = 0;
+            //if (data == null)
+            //{
+            //}
+            //else if(data.Count == 10)
+            //{
+            //    Username = data[0];
+            //    Password = data[1];
+            //    Bio = data[2];
+            //    Image = data[3];
+            //    Coins = int.Parse(data[4]);
+            //    Elo = int.Parse(data[5]);
+            //    GamesPlayed = int.Parse(data[6]);
+            //    Wins = int.Parse(data[7]);
+            //    Losses = int.Parse(data[8]);
+            //    Draws = int.Parse(data[9]);
+                    
+            //}
+
         }
 
         public void updateUserData(/*dictionary*/)

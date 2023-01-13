@@ -20,18 +20,30 @@ namespace MTCG.Server
         private DB.DataBase db = new DataBase();
         public string ParseHttpRequest(string data)
         {
+            string user = null;
             var request = data.Split('\n');
             int rlen = request.Length;
             var httpinfo = request[0].Split(' ');
             string Authmsg = null;
+            string subdir = httpinfo[1];
+            Console.WriteLine(subdir);
+            if (subdir.Length > 6)
+            {
+                if (subdir.Remove(6) == "/users")
+                {
+                    Console.WriteLine(subdir);
+                    httpinfo[1] = "/users";
+                }
+            }
             switch (httpinfo[1])
             {
                 case "/users": //get userinfo, check if already exists, if not add to db
-                    var userdata = JsonConvert.DeserializeObject<UsersTable>(request[rlen - 1]);
-                    if (!db.alreadyExists("users", (string)userdata.Username))
+                    if (subdir != "/users")
                     {
-                        return db.addUser(userdata);
+                        return AuthHandler(request, subdir.Substring(7), request.Length, httpinfo[1], httpinfo[0]);
                     }
+                    var userdata = JsonConvert.DeserializeObject<UsersTable>(request[rlen - 1]);
+                    return db.addUser(userdata);
                     break;
                 case "/sessions":
                     userdata = JsonConvert.DeserializeObject<UsersTable>(request[rlen - 1]);
@@ -43,43 +55,20 @@ namespace MTCG.Server
                     }
                     return result;
                 case "/packages":
-                    //first, check if admin
-                    (Authmsg, string str) = checkAuth(getAuthToken(request), "admin");
-                    if (Authmsg == "noAuthToken")
-                    {
-                        return new HttpResponse().Unauthorized401();
-                    }
-                    if (Authmsg == "valid")
-                    { //then create packages
-                        var package = JsonConvert.DeserializeObject<List<CardsJson>>(request[rlen - 1]);
-                        return db.addPackage(package);
-                    }
-                    else if(Authmsg == "invalid")
-                    {
-                        return new HttpResponse().Package403();
-                    }
-                    else
-                    {
-                        Console.WriteLine("case /packages error");
-                    }
+                    return AuthHandler(request, "admin", request.Length, httpinfo[1]/*"/packages"*/, httpinfo[0]);
                     break;
                 case "/transactions/packages":
-                    (Authmsg, string user) = checkAuth(getAuthToken(request), null);
-                    if (Authmsg == "noAuthToken")
-                    {
-                        return new HttpResponse().Unauthorized401();
-                    }
-                    if (Authmsg == "valid")
-                    { //authuser 
-                        return db.buyPackage(user);
-                    }
-                    else if (Authmsg == "invalid")
-                    {
-                        return new HttpResponse().noLoginPackage403();
-                    }
+                    return AuthHandler(request, null, request.Length, httpinfo[1]/*"/transactions/packages"*/, httpinfo[0]);
                     break;
+                case "/cards":
+                    return AuthHandler(request, null, request.Length, httpinfo[1]/*"/cards"*/, httpinfo[0]);
+                    break;
+                case "/deck":
+                    return AuthHandler(request, null, request.Length, httpinfo[1] /*"/deck"*/, httpinfo[0]);
+                        break;
                 default:
                     //Console.WriteLine("http request handler switch default");
+
                     break;
             }
             return "400;";
@@ -114,7 +103,7 @@ namespace MTCG.Server
             { //
                 authorizedUser = tokenuser;
             }
-            if (tokenuser == authorizedUser)
+            if ((tokenuser == authorizedUser) || (tokenuser) == "admin")
             { //check if user is logged in
                 foreach (var username in LoggedInUsers.ToList()) //ToList könnte schon das problem lösen, ansonsten zb lokal liste in einer variable speichern
                 {
@@ -151,7 +140,86 @@ namespace MTCG.Server
                 return ("invalid", null);
             }
         }
-        
+
+        public string AuthHandler(string[] request, string Authuser, int rlen, string subdir, string method)
+        {
+            string user = null;
+            string Authmsg = null;
+            (Authmsg, user) = checkAuth(getAuthToken(request), Authuser);
+            if (Authmsg == "noAuthToken")
+            {
+                return new HttpResponse().Unauthorized401();
+            }
+            if (Authmsg == "valid")
+            { //depending on subdir, return the right responses
+                switch (subdir)
+                {
+                    case "/packages":
+                        //then create packages
+                        var package = JsonConvert.DeserializeObject<List<CardsJson>>(request[rlen - 1]);
+                        return db.addPackage(package);
+                        break;
+                    case "/transactions/packages":
+                        return db.buyPackage(user);
+                        break;
+                    case "/cards":
+                        return db.showCards(user);
+                        break;
+                    case "/deck":
+                        if (method == "GET")
+                        {
+                            return db.showDeck(user);
+                        }
+                        if (method == "PUT")
+                        {
+                            var deck = parseDeck((request[rlen - 1]));
+                            //Console.WriteLine(deck.CardList.Count);
+                            if (!(deck.CardList.Count == 4))
+                            {
+                                return new HttpResponse().notEnoughCardsForDeck400();
+                            }
+                            return db.setDeck(user, deck);
+                        }
+                        break;
+                    case "/users": //this is /users/{username}
+                        if (method == "GET")
+                        {
+                            return db.showUserData(user);
+                        }
+                        if (method == "PUT")
+                        {
+                            var userdata = JsonConvert.DeserializeObject<UsersJson>(request[rlen - 1]);
+                            return db.editUserData(user, userdata);
+                        }
+                        break;
+                }
+                
+            }
+            else if (Authmsg == "invalid")
+            {
+                return new HttpResponse().notAuthUser403(Authuser);
+            }
+            else
+            {
+                Console.WriteLine("case /packages error");
+            }
+
+            return "hello world";
+        }
+
+        private DeckJson parseDeck(string json)
+        {
+            DeckJson result = new DeckJson();
+
+            var ids = json.Split(',');
+            foreach (var id in ids)
+            {
+                result.CardList.Add(id.Trim().TrimStart('[', '"').TrimEnd(']', '"'));
+                Console.WriteLine(result.CardList.Last());
+            }
+
+            return result;
+        }
     }
 
 }

@@ -6,10 +6,8 @@ using System.Threading.Tasks;
 
 namespace MTCG.json
 {
-    public class CardsJson
+    public class DeckJson
     {
-        public string Id;
-        public string Name;
-        public float Damage;
+        public List<string> CardList = new List<string>();
     }
 }
