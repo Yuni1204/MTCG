@@ -130,7 +130,12 @@ namespace MTCG.DB
 
         public string editUser()
         {
-            return "UPDATE users SET name = @newName, bio = @newBio, image = newImage WHERE username = @username";
+            return "UPDATE users SET name = @newName, bio = @newBio, image = @newImage WHERE username = @username";
+        }
+
+        public string getStats()
+        {
+            return "SELECT name, elo, wins, losses FROM users WHERE username = @username";
         }
     }
 }

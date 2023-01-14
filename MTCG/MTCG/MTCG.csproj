@@ -108,6 +108,7 @@
     <Compile Include="json\CardsJson.cs" />
     <Compile Include="json\DeckJson.cs" />
     <Compile Include="json\PackagesTable.cs" />
+    <Compile Include="json\StatsJson.cs" />
     <Compile Include="json\UsersJson.cs" />
     <Compile Include="json\UsersTable.cs" />
     <Compile Include="Program.cs" />

@@ -114,7 +114,7 @@ namespace MTCG.DB
             //"HTTP / 1.1 200 OK \r"
         }
 
-        public string searchUser(UsersTable userdata)
+        public string searchUser(UsersTable userdata)//session
         {
             using (var conn = new NpgsqlConnection(connString))
             {
@@ -266,7 +266,7 @@ namespace MTCG.DB
                     if (reader.HasRows) //hasRows means user from token exists in db
                     {
                         reader.Read();
-                        if (reader.GetInt32(4) < 5)
+                        if (reader.GetInt32(5) < 5)
                         {
                             //not enough money
                             return new Server.HttpResponse().BuyPackage403();
@@ -462,6 +462,34 @@ namespace MTCG.DB
             }
 
             return new HttpResponse().putUser200();
+        }
+
+        public string showStats(string user)
+        {
+            string jsonreply = null;
+            using (var conn = new NpgsqlConnection(connString))
+            {
+                conn.Open();
+                using (var command = new NpgsqlCommand(new SQL_Statements().getStats(), conn))
+                {
+                    command.Parameters.AddWithValue("@username", user);
+                    var reader = command.ExecuteReader();
+                    if (!reader.HasRows)
+                    {
+                        //maybe?
+                    }
+                    reader.Read();
+                    StatsJson userstats = new StatsJson();
+                    userstats.Name = reader.GetString(0);
+                    userstats.Elo = reader.GetInt32(1);
+                    userstats.Wins = reader.GetInt32(2);
+                    userstats.Losses = reader.GetInt32(3);
+                    jsonreply = JsonConvert.SerializeObject(userstats);
+                }
+                conn.Close();
+            }
+
+            return new HttpResponse().getStats200(jsonreply);
         }
 
         private List<CardsJson> getCard(NpgsqlDataReader reader)

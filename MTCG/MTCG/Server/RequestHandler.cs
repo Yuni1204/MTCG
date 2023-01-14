@@ -66,6 +66,9 @@ namespace MTCG.Server
                 case "/deck":
                     return AuthHandler(request, null, request.Length, httpinfo[1] /*"/deck"*/, httpinfo[0]);
                         break;
+                case "/stats":
+                    return AuthHandler(request, null, request.Length, httpinfo[1] /*/stats*/, httpinfo[0]);
+                    break;
                 default:
                     //Console.WriteLine("http request handler switch default");
 
@@ -105,6 +108,7 @@ namespace MTCG.Server
             }
             if ((tokenuser == authorizedUser) || (tokenuser) == "admin")
             { //check if user is logged in
+                if(tokenuser == "admin") { return true; }
                 foreach (var username in LoggedInUsers.ToList()) //ToList könnte schon das problem lösen, ansonsten zb lokal liste in einer variable speichern
                 {
                     if (username == tokenuser)
@@ -191,6 +195,9 @@ namespace MTCG.Server
                             var userdata = JsonConvert.DeserializeObject<UsersJson>(request[rlen - 1]);
                             return db.editUserData(user, userdata);
                         }
+                        break;
+                    case "/stats":
+                        return db.showStats(user);
                         break;
                 }
                 

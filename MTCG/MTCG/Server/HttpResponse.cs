@@ -285,5 +285,17 @@ namespace MTCG.Server
                    User successfully updated.
                    """;
         }
+
+        public string getStats200(string jsonstr)
+        {
+            string content = $"\r\n\r\n{jsonstr}";
+            return $"""
+                   HTTP/1.1 200 OK
+                   Content-Type: application/json
+                   Content-Length: {content.Length}{Environment.NewLine}
+                   {Environment.NewLine}
+                   {jsonstr}
+                   """;
+        }
     }
 }
