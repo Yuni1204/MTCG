@@ -343,7 +343,7 @@ namespace MTCG.DB
                 }
                 conn.Close();
             }
-            return new HttpResponse().showCards200(jsonreply);
+            return new HttpResponse().jsonResponse200(jsonreply);
         }
 
         public string showDeck(string user)
@@ -368,7 +368,7 @@ namespace MTCG.DB
 
             }
 
-            return new HttpResponse().showDeck200(jsonreply);
+            return new HttpResponse().jsonResponse200(jsonreply);
         }
 
         public string setDeck(string user, DeckJson deck)
@@ -442,7 +442,7 @@ namespace MTCG.DB
                 }
             }
 
-            return new HttpResponse().getUser200(jsonreply);
+            return new HttpResponse().jsonResponse200(jsonreply);
         }
 
         public string editUserData(string user, UsersJson userdata)
@@ -489,7 +489,38 @@ namespace MTCG.DB
                 conn.Close();
             }
 
-            return new HttpResponse().getStats200(jsonreply);
+            return new HttpResponse().jsonResponse200(jsonreply);
+        }
+
+        public string showScoreboard()
+        {
+            string jsonreply = null;
+            List<StatsJson> Scoreboard = new List<StatsJson>();
+            using (var conn = new NpgsqlConnection(connString))
+            {
+                conn.Open();
+                using (var command = new NpgsqlCommand(new SQL_Statements().getScoreboard(), conn))
+                {
+                    var reader = command.ExecuteReader();
+                    if (!reader.HasRows)
+                    {
+                        //maybe?
+                    }
+
+                    while (reader.Read())
+                    {
+                        StatsJson userstats = new StatsJson();
+                        userstats.Name = reader.GetString(0);
+                        userstats.Elo = reader.GetInt32(1);
+                        userstats.Wins = reader.GetInt32(2);
+                        userstats.Losses = reader.GetInt32(3);
+                        Scoreboard.Add(userstats);
+                    }
+                    jsonreply = JsonConvert.SerializeObject(Scoreboard);
+                }
+                conn.Close();
+            }
+            return new HttpResponse().jsonResponse200(jsonreply);
         }
 
         private List<CardsJson> getCard(NpgsqlDataReader reader)

@@ -165,17 +165,17 @@ namespace MTCG.Server
                    """;
         }
 
-        public string showCards200(string jsonstr)
-        {
-            string content = $"\r\n\r\n{jsonstr}";
-            return $"""
-                   HTTP/1.1 200 OK
-                   Content-Type: application/json
-                   Content-Length: {content.Length}{Environment.NewLine}
-                   {Environment.NewLine}
-                   {jsonstr}
-                   """;
-        }
+        //public string showCards200(string jsonstr)
+        //{
+        //    string content = $"\r\n\r\n{jsonstr}";
+        //    return $"""
+        //           HTTP/1.1 200 OK
+        //           Content-Type: application/json
+        //           Content-Length: {content.Length}{Environment.NewLine}
+        //           {Environment.NewLine}
+        //           {jsonstr}
+        //           """;
+        //}
 
         public string showCards203()
         {
@@ -189,18 +189,18 @@ namespace MTCG.Server
                    """;
         }
 
-        public string showDeck200(string jsonstr)
-        {
-            //Console.WriteLine(jsonstr);
-            string content = $"\r\n\r\n{jsonstr}";
-            return $"""
-                   HTTP/1.1 200 OK
-                   Content-Type: application/json
-                   Content-Length: {content.Length}{Environment.NewLine}
-                   {Environment.NewLine}
-                   {jsonstr}
-                   """;
-        }
+        //public string showDeck200(string jsonstr)
+        //{
+        //    //Console.WriteLine(jsonstr);
+        //    string content = $"\r\n\r\n{jsonstr}";
+        //    return $"""
+        //           HTTP/1.1 200 OK
+        //           Content-Type: application/json
+        //           Content-Length: {content.Length}{Environment.NewLine}
+        //           {Environment.NewLine}
+        //           {jsonstr}
+        //           """;
+        //}
 
         public string emptyDeck203()
         {
@@ -250,17 +250,17 @@ namespace MTCG.Server
                    """;
         }
 
-        public string getUser200(string jsonstr)
-        {
-            string content = $"\r\n\r\n{jsonstr}";
-            return $"""
-                   HTTP/1.1 200 OK
-                   Content-Type: application/json
-                   Content-Length: {content.Length}{Environment.NewLine}
-                   {Environment.NewLine}
-                   {jsonstr}
-                   """;
-        }
+        //public string getUser200(string jsonstr)
+        //{
+        //    string content = $"\r\n\r\n{jsonstr}";
+        //    return $"""
+        //           HTTP/1.1 200 OK
+        //           Content-Type: application/json
+        //           Content-Length: {content.Length}{Environment.NewLine}
+        //           {Environment.NewLine}
+        //           {jsonstr}
+        //           """;
+        //}
 
         public string getUser404()
         {
@@ -286,7 +286,19 @@ namespace MTCG.Server
                    """;
         }
 
-        public string getStats200(string jsonstr)
+        //public string getStats200(string jsonstr)
+        //{
+        //    string content = $"\r\n\r\n{jsonstr}";
+        //    return $"""
+        //           HTTP/1.1 200 OK
+        //           Content-Type: application/json
+        //           Content-Length: {content.Length}{Environment.NewLine}
+        //           {Environment.NewLine}
+        //           {jsonstr}
+        //           """;
+        //}
+
+        public string jsonResponse200(string jsonstr)
         {
             string content = $"\r\n\r\n{jsonstr}";
             return $"""

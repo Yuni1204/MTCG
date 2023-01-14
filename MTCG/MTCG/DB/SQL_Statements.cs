@@ -137,5 +137,10 @@ namespace MTCG.DB
         {
             return "SELECT name, elo, wins, losses FROM users WHERE username = @username";
         }
+
+        public string getScoreboard()
+        {
+            return "SELECT name, elo, wins, losses FROM users WHERE username != 'admin' ORDER BY elo DESC";
+        }
     }
 }

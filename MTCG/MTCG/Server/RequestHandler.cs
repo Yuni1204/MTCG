@@ -69,6 +69,9 @@ namespace MTCG.Server
                 case "/stats":
                     return AuthHandler(request, null, request.Length, httpinfo[1] /*/stats*/, httpinfo[0]);
                     break;
+                case "/score":
+                    return AuthHandler(request, null, request.Length, httpinfo[1] /*/score*/, httpinfo[0]);
+                    break;
                 default:
                     //Console.WriteLine("http request handler switch default");
 
@@ -192,13 +195,15 @@ namespace MTCG.Server
                         }
                         if (method == "PUT")
                         {
-                            var userdata = JsonConvert.DeserializeObject<UsersJson>(request[rlen - 1]);
-                            return db.editUserData(user, userdata);
+                            //var userdata = JsonConvert.DeserializeObject<UsersJson>(request[rlen - 1]);
+                            return db.editUserData(user, JsonConvert.DeserializeObject<UsersJson>(request[rlen - 1]));
                         }
                         break;
                     case "/stats":
                         return db.showStats(user);
                         break;
+                    case "/score":
+                        return db.showScoreboard();
                 }
                 
             }
