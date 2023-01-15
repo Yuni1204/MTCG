@@ -11,6 +11,10 @@ namespace MTCG.App
     {
         public List<Player> PlayerQ = new List<Player>();
         public bool statsUpdated = false;
+        Battle Game = new Battle();
+        private bool gameStarted = false;
+        List<string> battleLog = new List<string>();
+
 
         public bool matchupAvailable()
         {
@@ -38,35 +42,42 @@ namespace MTCG.App
 
         public (Player p1, Player p2, List<string> log) startBattle(Player p1, Player p2)
         {
-            Battle Game = new Battle();
-            (int winner, List<string> log) = Game.cardBattle(p1.Deck, p2.Deck);
-            if (!statsUpdated)
+            if (!gameStarted)
             {
-                if (winner == 1)
+                gameStarted = true;
+                lock (battleLog)
                 {
-                    p1.Elo += 3;
-                    p1.Wins++;
-                    p2.Elo += 5;
-                    p2.Losses++;
+                    (int winner, battleLog) = Game.cardBattle(p1.Deck, p2.Deck);
+                    if (!statsUpdated)
+                    {
+                        if (winner == 1)
+                        {
+                            p1.Elo += 3;
+                            p1.Wins++;
+                            p2.Elo -= 5;
+                            p2.Losses++;
+                        }
+                        else if (winner == 2)
+                        {
+                            p2.Elo += 3;
+                            p2.Wins++;
+                            p1.Elo -= 5;
+                            p1.Losses++;
+                        }
+                        else
+                        {
+                            //draw
+                        }
+
+                        statsUpdated = true;
+                    }
+                    else
+                    {
+                        statsUpdated = false;
+                    }
                 }
-                else if (winner == 2)
-                {
-                    p2.Elo += 3;
-                    p2.Wins++;
-                    p1.Elo += 5;
-                    p1.Losses++;
-                }
-                else
-                {
-                    //draw
-                }
-                statsUpdated = true;
             }
-            else
-            {
-                statsUpdated = false;
-            }
-            return (p1, p2, log);
+            return (p1, p2, battleLog);
         }
     }
 }

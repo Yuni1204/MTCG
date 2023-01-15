@@ -10,6 +10,7 @@ using System.Data.SqlClient;
 using System.Text;
 using MTCG.Server;
 using Newtonsoft.Json;
+using System.Numerics;
 
 namespace MTCG.DB
 {
@@ -607,7 +608,26 @@ namespace MTCG.DB
             return new HttpResponse().battle200(battleLog);
         }
 
-        
+        public void rewardLowerEloPlayer(string user)
+        {
+            using (var conn = new NpgsqlConnection(connString))
+            {
+                conn.Open();
+                using (var command = new NpgsqlCommand(new SQL_Statements().reward5Coins(), conn))
+                {
+                    command.Parameters.AddWithValue("@username", user);
+                    command.ExecuteNonQuery();
+                    //if (!reader.HasRows)
+                    //{
+                    //    //maybe?
+                    //    Console.WriteLine("\n\n\n\n\n\n\n\n\n\n\n\n\n\nALARM ALARM ALARM\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
+                    //}
+                }
+                conn.Close();
+            }
+        }
+
+
         private List<CardsJson> getCard(NpgsqlDataReader reader)
         {
             List<CardsJson> reply = new List<CardsJson>();

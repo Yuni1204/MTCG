@@ -24,6 +24,13 @@ namespace MTCG.Server
         private Lobby GameLobby = new Lobby();
         private bool only1PlayerDone = false;
         private bool gameRunning = false;
+        public int eloP1Before;
+        public int eloP2Before;
+
+        public void LoginHighEloGamer()
+        {
+            LoggedInUsers.Add("HighEloGamer");
+        }
 
         public string ParseHttpRequest(string data)
         {
@@ -216,6 +223,7 @@ namespace MTCG.Server
                         return db.showScoreboard();
                         break;
                     case "/battles":
+                        
                         if (playerAlreadyInQ(user))
                         {
                             return new HttpResponse().tooManyRequests429();
@@ -228,7 +236,6 @@ namespace MTCG.Server
                         {
                             Thread.Sleep(1000);
                         }
-
                         Player p1 = new Player();
                         Player p2 = new Player();
                         List<string> battleLog = new List<string>();
@@ -236,6 +243,8 @@ namespace MTCG.Server
                         {
                             p1 = GameLobby.PlayerQ.ElementAt(0);
                             p2 = GameLobby.PlayerQ.ElementAt(1);
+                            eloP1Before = p1.Elo;
+                            eloP2Before = p2.Elo;
                         }
                         gameRunning = true;
                         (p1, p2, battleLog)  = GameLobby.startBattle(p1, p2);
@@ -262,7 +271,18 @@ namespace MTCG.Server
                                 GameLobby.PlayerQ.Remove(p1);
                             }
                             //update stats
-                            Console.WriteLine("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n" + GameLobby.PlayerQ.Count);
+                            //Console.WriteLine("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n" + GameLobby.PlayerQ.Count);
+                            if (eloDiff(eloP1Before, eloP2Before) > 25)
+                            {
+                                if (getLowerEloPlayer(eloP1Before, eloP2Before)) //true means elo2 is lowerEloPlayer, when false -> elo1
+                                {
+                                    db.rewardLowerEloPlayer(p2.Username);
+                                }
+                                else
+                                {
+                                    db.rewardLowerEloPlayer(p1.Username);
+                                }
+                            }
                             return db.updatePlayerData(p1, battleLog);
                         }
                         else if (p2.Username == user)
@@ -277,7 +297,7 @@ namespace MTCG.Server
                             }
                             //update stats
 
-                            Console.WriteLine("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n" + GameLobby.PlayerQ.Count);
+                            //Console.WriteLine("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n" + GameLobby.PlayerQ.Count);
                             return db.updatePlayerData(p2, battleLog);
                         }
                         //if (GameLobby.matchupAvailable() && playerForNextMatch(user))
@@ -303,6 +323,18 @@ namespace MTCG.Server
             }
 
             return "hello world";
+        }
+
+        public int eloDiff(int elo1, int elo2)
+        {
+            if (elo1 > elo2)
+            {
+                return elo1 - elo2;
+            }
+            else
+            {
+                return elo2 - elo1;
+            }
         }
 
         private bool playerAlreadyInQ(string user)
@@ -338,6 +370,11 @@ namespace MTCG.Server
                 return false;
             }
             return true;
+        }
+
+        public bool getLowerEloPlayer(int elo1, int elo2)
+        {
+            return elo1 > elo2; //true means elo2 is lowerEloPlayer, when false -> elo1
         }
 
         private DeckJson parseDeck(string json)

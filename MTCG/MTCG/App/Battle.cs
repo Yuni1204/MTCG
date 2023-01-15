@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace MTCG
 {
-    internal class Battle
+    public class Battle
     {
         Random rng = new Random();
         public List<string> log = new List<string>();
@@ -54,26 +54,6 @@ namespace MTCG
                 return (0, log);
             }
         }
-
-        private bool loserDeck(Card loser, List<Card> deck)
-        {
-            if (deck.Count == 0)
-            {
-                return true;
-            }
-            else
-            {
-                foreach (Card card in deck)
-                {
-                    if (card.Id == loser.Id)
-                    {
-                        return true;
-                    }
-                }
-            }
-            return false;
-        }
-
         public Card CardVsCard(Card card1, Card card2)
         {
             var specialcasewinner = specialCase(card1, card2);
@@ -114,26 +94,10 @@ namespace MTCG
                 return winner;
             }
         }
-
-        private bool spellCardExists(string typeC1, string typeC2)
-        {
-            if (typeC1 == "SpellCard" || typeC2 == "SpellCard")
-            {
-                return true;
-            }
-            return false;
-        }
-
         public Card getCardFromDeck(List<Card> deck)
         {
             return deck.ElementAt(rngInRange(deck.Count));
         }
-
-        private int rngInRange(int range)
-        {
-            return rng.Next(range);
-        }
-
         public Card cvcWithElements(Card c1, Card c2)
         {
             float eDmg1 = c1.Dmg;
@@ -152,7 +116,6 @@ namespace MTCG
                 return null;
             }
         }
-
         public Card cvcWithoutElements(Card c1, Card c2)
         {
             if (c1.Dmg > c2.Dmg)
@@ -169,7 +132,40 @@ namespace MTCG
             }
         }
 
-        private (float, float) getEffectiveDmg(Card c1, Card c2)
+        public bool loserDeck(Card loser, List<Card> deck)
+        {
+            if (deck.Count == 0)
+            {
+                return true;
+            }
+            else
+            {
+                foreach (Card card in deck)
+                {
+                    if (card.Id == loser.Id)
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        public bool spellCardExists(string typeC1, string typeC2)
+        {
+            if (typeC1 == "SpellCard" || typeC2 == "SpellCard")
+            {
+                return true;
+            }
+            return false;
+        }
+
+        private int rngInRange(int range)
+        {
+            return rng.Next(range);
+        }
+
+        public (float, float) getEffectiveDmg(Card c1, Card c2)
         {
             if (waterVSfire(c1.Element, c2.Element) > 0)
             {
@@ -201,7 +197,7 @@ namespace MTCG
             }
         }
 
-        private int waterVSfire(string Element1, string Element2)
+        public int waterVSfire(string Element1, string Element2)
         {
             if (Element1 == "Water" && Element2 == "Fire")
             {
@@ -213,7 +209,7 @@ namespace MTCG
             }
             else { return 0; }
         }
-        private int fireVSnormal(string Element1, string Element2)
+        public int fireVSnormal(string Element1, string Element2)
         {
             if (Element1 == "Fire" && Element2 == "Normal")
             {
@@ -225,7 +221,7 @@ namespace MTCG
             }
             else { return 0; }
         }
-        private int normalVSwater(string Element1, string Element2)
+        public int normalVSwater(string Element1, string Element2)
         {
             if (Element1 == "Normal" && Element2 == "Water")
             {
@@ -237,7 +233,6 @@ namespace MTCG
             }
             else { return 0; }
         }
-
 
         private Card specialCase(Card c1, Card c2)
         {
@@ -281,7 +276,7 @@ namespace MTCG
             }
         }
 
-        private int goblinVSdragon(string cName1, string cName2)
+        public int goblinVSdragon(string cName1, string cName2)
         {
             if (cName1.Contains("Dragon") && cName2.Contains("Goblin"))
             {
@@ -296,7 +291,7 @@ namespace MTCG
                 return -1;
             }
         }
-        private int wizardVSorks(string cName1, string cName2)
+        public int wizardVSorks(string cName1, string cName2)
         {
             if (cName1.Contains("Wizard") && cName2.Contains("Ork"))
             {
@@ -311,7 +306,7 @@ namespace MTCG
                 return -1;
             }
         }
-        private int knightVSwaterspell(string cName1, string cName2)
+        public int knightVSwaterspell(string cName1, string cName2)
         {
             if (cName1.Contains("WaterSpell") && cName2.Contains("Knight"))
             {
@@ -326,7 +321,7 @@ namespace MTCG
                 return -1;
             }
         }
-        private int krakenVSspell(string cName1, string cName2)
+        public int krakenVSspell(string cName1, string cName2)
         {
             if (cName1.Contains("Kraken") && cName2.Contains("Spell"))
             {
@@ -341,7 +336,7 @@ namespace MTCG
                 return -1;
             }
         }
-        private int fireelvesVSdragon(string cName1, string cName2)
+        public int fireelvesVSdragon(string cName1, string cName2)
         {
             if (cName1.Contains("FireElve") && cName2.Contains("Dragon"))
             {

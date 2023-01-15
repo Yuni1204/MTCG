@@ -41,6 +41,7 @@ namespace MTCG
                 //String result = null;
 
                 RequestHandler handler = new RequestHandler();
+                handler.LoginHighEloGamer(); //for unique feature test
 
                 // Enter the listening loop.
                 while (true)

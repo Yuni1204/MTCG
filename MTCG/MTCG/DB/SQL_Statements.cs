@@ -147,5 +147,10 @@ namespace MTCG.DB
         {
             return "UPDATE users SET elo = @newElo, wins = @newWins, losses = @newLosses WHERE username = @username";
         }
+
+        public string reward5Coins()
+        {
+            return "UPDATE users SET coins = coins + 5 WHERE username = @username";
+        }
     }
 }

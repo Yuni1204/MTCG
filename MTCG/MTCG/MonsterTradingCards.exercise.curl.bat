@@ -225,6 +225,12 @@ start /b "altenhof battle" curl -X POST http://localhost:10001/battles --header 
 ping localhost -n 10 >NUL 2>NUL
 
 REM --------------------------------------------------
+REM echo 17.1) MANDATORY UNIQUE FEATURE
+REM  start /b "kienboec battle" curl -X POST http://localhost:10001/battles --header "Authorization: Basic kienboec-mtcgToken"
+REM  start /b "HighEloGamer battle" curl -X POST http://localhost:10001/battles --header "Authorization: Basic HighEloGamer-mtcgToken"
+REM ping localhost -n 10 >NUL 2>NUL
+
+REM --------------------------------------------------
 echo 18) Stats 
 echo kienboec
 curl -X GET http://localhost:10001/stats --header "Authorization: Basic kienboec-mtcgToken"
