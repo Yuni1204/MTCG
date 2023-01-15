@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.SqlTypes;
 using System.Linq;
 using System.Text;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
+using System.Threading;
 using System.Threading.Tasks;
 using MTCG.App;
 using MTCG.DB;
@@ -16,8 +18,13 @@ namespace MTCG.Server
     internal class RequestHandler
     {
         //UPDATE LoggedInUser to LIST<User>
+        private readonly object _lock = new object();
         public List<string> LoggedInUsers = new List<string>();
         private DB.DataBase db = new DataBase();
+        private Lobby GameLobby = new Lobby();
+        private bool only1PlayerDone = false;
+        private bool gameRunning = false;
+
         public string ParseHttpRequest(string data)
         {
             string user = null;
@@ -71,6 +78,9 @@ namespace MTCG.Server
                     break;
                 case "/score":
                     return AuthHandler(request, null, request.Length, httpinfo[1] /*/score*/, httpinfo[0]);
+                    break;
+                case "/battles":
+                    return AuthHandler(request, getUserFromToken(getAuthToken(request)), request.Length, httpinfo[1] /*/score*/, httpinfo[0]);
                     break;
                 default:
                     //Console.WriteLine("http request handler switch default");
@@ -204,6 +214,82 @@ namespace MTCG.Server
                         break;
                     case "/score":
                         return db.showScoreboard();
+                        break;
+                    case "/battles":
+                        if (playerAlreadyInQ(user))
+                        {
+                            return new HttpResponse().tooManyRequests429();
+                        }
+                        lock (_lock)
+                        {
+                            GameLobby.PlayerQ.Add(db.getPlayerForBattle(user));
+                        }
+                        while (inQueue(user)) //no opponent
+                        {
+                            Thread.Sleep(1000);
+                        }
+
+                        Player p1 = new Player();
+                        Player p2 = new Player();
+                        List<string> battleLog = new List<string>();
+                        lock (_lock)
+                        {
+                            p1 = GameLobby.PlayerQ.ElementAt(0);
+                            p2 = GameLobby.PlayerQ.ElementAt(1);
+                        }
+                        gameRunning = true;
+                        (p1, p2, battleLog)  = GameLobby.startBattle(p1, p2);
+                        gameRunning = false;
+                        lock (_lock)
+                        {
+                            if (only1PlayerDone)
+                            {
+                                only1PlayerDone = false;
+                            }
+                            else if (!only1PlayerDone)
+                            {
+                                only1PlayerDone = true;
+                            }
+                        }
+                        if (p1.Username == user)
+                        {
+                            while (only1PlayerDone)
+                            {
+                                Thread.Sleep(1000);
+                            }
+                            lock (_lock)
+                            {
+                                GameLobby.PlayerQ.Remove(p1);
+                            }
+                            //update stats
+                            Console.WriteLine("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n" + GameLobby.PlayerQ.Count);
+                            return db.updatePlayerData(p1, battleLog);
+                        }
+                        else if (p2.Username == user)
+                        {
+                            while (only1PlayerDone)
+                            {
+                                Thread.Sleep(1000);
+                            }
+                            lock (_lock)
+                            {
+                                GameLobby.PlayerQ.Remove(p2);
+                            }
+                            //update stats
+
+                            Console.WriteLine("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n" + GameLobby.PlayerQ.Count);
+                            return db.updatePlayerData(p2, battleLog);
+                        }
+                        //if (GameLobby.matchupAvailable() && playerForNextMatch(user))
+                        //{
+                        //    GameLobby.startBattle(GameLobby.PlayerQ.ElementAt(0), GameLobby.PlayerQ.ElementAt(1));
+                        //}
+                        //else
+                        //{
+                        //    //wait
+                        //}
+                        //return 
+                        break;
                 }
                 
             }
@@ -217,6 +303,41 @@ namespace MTCG.Server
             }
 
             return "hello world";
+        }
+
+        private bool playerAlreadyInQ(string user)
+        {
+            if (GameLobby.PlayerQ.Count > 0)
+            {
+                foreach (var player in GameLobby.PlayerQ)
+                {
+                    if (player.Username == user)
+                    {
+                        // player is already waiting in lobby
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        private bool playerForNextMatch(string user)
+        {
+            if ((GameLobby.PlayerQ.ElementAt(0).Username == user) ||
+                (GameLobby.PlayerQ.ElementAt(1).Username == user))
+            {
+                return true;
+            }
+            return false;
+        }
+
+        private bool inQueue(string user)
+        {
+            if (!gameRunning && playerForNextMatch(user) && (GameLobby.PlayerQ.Count >= 2))
+            {
+                return false;
+            }
+            return true;
         }
 
         private DeckJson parseDeck(string json)

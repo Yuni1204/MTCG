@@ -6,16 +6,21 @@ using System.Threading.Tasks;
 
 namespace MTCG
 {
-    class MonsterCard : Card
+    public class MonsterCard : Card
     {
-        public MonsterCard(string newname)
+        public MonsterCard(string cardId, string cardname, float carddmg)
         {
-            Name = newname;
+            Id = cardId;
+            Name = cardname;
             Type = "MonsterCard";
+            Element = setElement();
+            Dmg = carddmg;
         }
-        public override void Interact(string targetname)
-        {
-            Console.WriteLine($"{targetname} du hurensohn!");
-        }
+
+        
+        //public override void Interact(string targetname)
+        //{
+        //    Console.WriteLine($"{targetname} du hurensohn!");
+        //}
     }
 }

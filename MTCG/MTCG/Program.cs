@@ -13,26 +13,26 @@ namespace MTCG
     {
         static void Main(string[] args)
         {
-            // socket from moodle
-            //var serverSock = new Socket(
-            //    AddressFamily.InterNetwork,
-            //    SocketType.Stream,
-            //    ProtocolType.Tcp
-            //);
-            //serverSock.Bind(new IPEndPoint(IPAddress.Loopback, 10101));
-            //serverSock.Listen(5);
-            //var clientSock = serverSock.Accept();
-            //clientSock.Send(Encoding.ASCII.GetBytes("Hello World"));
-            
-            //var db = new DataBase();
-            //db.addUser();
-            //string stringlines = "hello world\nwello horld\nline 3";
-            //var rqhandler = new RequestHandler();
-            //rqhandler.ParseHttpRequest(stringlines);
+            //List<Card> Player1 = new List<Card>();
+            //Player1.Add(new MonsterCard("1", "FireElve", 1));
+            //Player1.Add(new MonsterCard("2", "FireElve", 2));
+            //Player1.Add(new MonsterCard("3", "FireElve", 3));
+            //Player1.Add(new MonsterCard("4", "FireElve", 4));
+            //List<Card> Player2 = new List<Card>();
+            //Player2.Add(new MonsterCard("5", "Dragon", 5));
+            //Player2.Add(new MonsterCard("6", "Dragon", 6));
+            //Player2.Add(new MonsterCard("7", "Dragon", 7));
+            //Player2.Add(new MonsterCard("8", "Dragon", 8));
+            //var testbattle = new Battle();
+            //testbattle.cardBattle(Player1, Player2);
+            //foreach (var round in testbattle.log)
+            //{
+            //    Console.WriteLine(round);
+            //}
+
             MyTcpListener server = new MyTcpListener();
             server.StartServer();
-            //var Game = new Game();
-            //Game.Beschimpfen();
+
         }
     }
 }

@@ -75,8 +75,8 @@ namespace MTCG.DB
                 conn.Open();
                 SQLstatement = "CREATE TABLE IF NOT EXISTS users" +
                                "(username VARCHAR(50) PRIMARY KEY, password VARCHAR(50), name VARCHAR(50), bio VARCHAR(50), " +
-                               "image VARCHAR(10), coins integer DEFAULT 20, elo integer DEFAULT 100, games integer DEFAULT 0, " +
-                               "wins integer DEFAULT 0, losses integer DEFAULT 0, draws integer DEFAULT 0)";
+                               "image VARCHAR(10), coins integer DEFAULT 20, elo integer DEFAULT 100, " +
+                               "wins integer DEFAULT 0, losses integer DEFAULT 0)";
                 using (var command = new NpgsqlCommand(SQLstatement, conn))
                 {
                     command.ExecuteNonQuery();
@@ -523,6 +523,91 @@ namespace MTCG.DB
             return new HttpResponse().jsonResponse200(jsonreply);
         }
 
+        public Player getPlayerForBattle(string user)
+        {
+            //retrieve data
+            Player player = new Player();
+            using (var conn = new NpgsqlConnection(connString))
+            {
+                conn.Open();
+                using (var command = new NpgsqlCommand(new SQL_Statements().getStats(), conn))
+                {
+                    command.Parameters.AddWithValue("@username", user);
+                    var reader = command.ExecuteReader();
+                    if (!reader.HasRows)
+                    {
+                        //maybe?
+                    }
+                    reader.Read();
+                    player.Name = reader.GetString(0);
+                    player.Elo = reader.GetInt32(1);
+                    player.Wins = reader.GetInt32(2);
+                    player.Losses = reader.GetInt32(3);
+                    player.Username = reader.GetString(4);
+                    reader.Close();
+                }
+
+
+                using (var command = new NpgsqlCommand(new SQL_Statements().getDeck(), conn))
+                {
+                    command.Parameters.AddWithValue("@username", user);
+                    var reader = command.ExecuteReader();
+                    if (!reader.HasRows)
+                    {
+                        //maybe?
+                    }
+                    while (reader.Read())
+                    {
+                        Card card;
+                        if (reader.GetString(1).Contains("Spell"))
+                        {
+                            card = new SpellCard(reader.GetString(0), reader.GetString(1), reader.GetFloat(2));
+                        }
+                        else
+                        {
+                            card = new MonsterCard(reader.GetString(0), reader.GetString(1), reader.GetFloat(2));
+                        }
+                        player.Deck.Add(card);
+                    }
+                }
+
+
+
+
+                conn.Close();
+            }
+
+            return player;
+
+            //return new HttpResponse().battle200();
+        }
+
+        public string updatePlayerData(Player player, List<string> battleLog)
+        {
+
+            using (var conn = new NpgsqlConnection(connString))
+            {
+                conn.Open();
+                using (var command = new NpgsqlCommand(new SQL_Statements().updateStats(), conn))
+                {
+                    command.Parameters.AddWithValue("@newElo", player.Elo);
+                    command.Parameters.AddWithValue("@newWins", player.Wins);
+                    command.Parameters.AddWithValue("@newLosses", player.Losses);
+                    command.Parameters.AddWithValue("@username", player.Username);
+                    command.ExecuteNonQuery();
+                    //if (!reader.HasRows)
+                    //{
+                    //    //maybe?
+                    //    Console.WriteLine("\n\n\n\n\n\n\n\n\n\n\n\n\n\nALARM ALARM ALARM\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
+                    //}
+                }
+                conn.Close();
+            }
+            //Console.WriteLine("\n\n\n\n\n\n\n\n\n\n\n\n\n\nhrerehrehrerherherherhe\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
+            return new HttpResponse().battle200(battleLog);
+        }
+
+        
         private List<CardsJson> getCard(NpgsqlDataReader reader)
         {
             List<CardsJson> reply = new List<CardsJson>();

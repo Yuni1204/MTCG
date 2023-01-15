@@ -99,7 +99,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="App\User.cs" />
+    <Compile Include="App\Lobby.cs" />
+    <Compile Include="App\Player.cs" />
     <Compile Include="DB\SQL_Statements.cs" />
     <Compile Include="Enum\enum.cs" />
     <Compile Include="App\Battle.cs" />

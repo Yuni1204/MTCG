@@ -135,12 +135,17 @@ namespace MTCG.DB
 
         public string getStats()
         {
-            return "SELECT name, elo, wins, losses FROM users WHERE username = @username";
+            return "SELECT name, elo, wins, losses, username FROM users WHERE username = @username";
         }
 
         public string getScoreboard()
         {
             return "SELECT name, elo, wins, losses FROM users WHERE username != 'admin' ORDER BY elo DESC";
+        }
+
+        public string updateStats()
+        {
+            return "UPDATE users SET elo = @newElo, wins = @newWins, losses = @newLosses WHERE username = @username";
         }
     }
 }

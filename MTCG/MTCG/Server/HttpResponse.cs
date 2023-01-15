@@ -309,5 +309,31 @@ namespace MTCG.Server
                    {jsonstr}
                    """;
         }
+
+        public string battle200(List<string> battleLog)
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.Append(Environment.NewLine);
+            sb.Append(Environment.NewLine);
+            foreach (var line in battleLog)
+            {
+                sb.Append(line);
+            }
+            sb.Append(Environment.NewLine);
+            string content = sb.ToString();
+            return $"HTTP/1.1 200 OK \nContent-Type: text/plain Content-Length: {content.Length+1}{content}";
+        }
+
+        public string tooManyRequests429()
+        {
+            string content = $"{Environment.NewLine}{Environment.NewLine}User is already in Queue";
+            return $"""
+                   HTTP/1.1 429 Too Many Requests
+                   Content-Type: text/plain
+                   Content-Length: {content.Length}{Environment.NewLine}
+                   {Environment.NewLine}
+                   User is already in Queue
+                   """;
+        }
     }
 }

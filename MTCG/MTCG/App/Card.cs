@@ -1,16 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace MTCG
 {
-   abstract class Card
+   public abstract class Card
    {
+       private string _id;
        private string _name;
        private string _type;
-       private int _dmg;
+       private string _element;
+       private float _dmg;
+
+       public string Id
+       {
+           get => _id;
+           set => _id = value;
+        }
 
        public string Name
        {
@@ -24,20 +33,31 @@ namespace MTCG
            set => _type = value;
        }
 
-       public int Dmg
+       public string Element
+       {
+           get => _element;
+           set => _element = value;
+       }
+
+       public float Dmg
        {
            get => _dmg;
            set => _dmg = value;
        }
 
-        //Card(string newname, string newtype)
-        //{
-        //    Name = newname;
-        //    Type = newtype;
-        //}
-
-        public abstract void Interact(string targetname);
-
+       protected string setElement()
+       {
+           if (Name.Contains("Fire"))
+           {
+               return "Fire";
+           } else if (Name.Contains("Water"))
+           {
+               return "Water";
+           } else
+           {
+               return "Normal";
+           }
+       }
 
    }
 }

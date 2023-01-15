@@ -6,16 +6,21 @@ using System.Threading.Tasks;
 
 namespace MTCG
 {
-    class SpellCard : Card
+    public class SpellCard : Card
     {
-        public SpellCard(string newname)
+        public SpellCard(string cardId, string cardname, float carddmg)
         {
-            Name = newname;
+            Id = cardId;
+            Name = cardname;
             Type = "SpellCard";
+            Element = setElement();
+            Dmg = carddmg;
         }
-        public override void Interact(string targetname)
-        {
-            Console.WriteLine($"{targetname} du gaesekki!");
-        }
+
+        
+        //public override void Interact(string targetname)
+        //{
+        //    Console.WriteLine($"{targetname} du gaesekki!");
+        //}
     }
 }
